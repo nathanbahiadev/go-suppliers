@@ -42,6 +42,38 @@ func TestInvalidEmails(t *testing.T) {
 	}
 }
 
+func TestValidPasswords(t *testing.T) {
+	passwords := []entity.Password{
+		{Value: "12345678Na!"},
+		{Value: "abcdefgH!!2"},
+		{Value: "1234efgh#Ça"},
+		{Value: "a@a#a$2%Ava"},
+		{Value: "@@@@@@@@1Na"},
+	}
+
+	for _, password := range passwords {
+		err := password.Validate()
+		assert.Nil(t, err, fmt.Sprintf("%s should be valid", password.Value))
+	}
+}
+
+func TestInvalidPasswords(t *testing.T) {
+	passwords := []entity.Password{
+		{Value: "testtest"},
+		{Value: "        "},
+		{Value: "12345678"},
+		{Value: "Naaaaaaa"},
+		{Value: "aaaaaaa1"},
+		{Value: "@@@@@@@@"},
+		{Value: "N@@@@@@@"},
+	}
+
+	for _, password := range passwords {
+		err := password.Validate()
+		assert.NotNil(t, err, fmt.Sprintf("%s should be invalid", password.Value))
+	}
+}
+
 func TestValidateUserWhenIDIsEmptyShouldRaiseAnError(t *testing.T) {
 	user := entity.User{}
 
@@ -60,8 +92,9 @@ func TestValidateUserWhenEmailIsInvalidShouldRaiseAnError(t *testing.T) {
 
 func TestValidateUserWhenNameIsEmptyShouldRaiseAnError(t *testing.T) {
 	user := entity.User{
-		ID:    "1",
-		Email: entity.Email{Value: "user@email.com"},
+		ID:       "1",
+		Email:    entity.Email{Value: "user@email.com"},
+		Password: entity.Password{Value: "12345678Na!"},
 	}
 
 	err := user.Validate()
@@ -70,8 +103,9 @@ func TestValidateUserWhenNameIsEmptyShouldRaiseAnError(t *testing.T) {
 
 func TestCreateUser(t *testing.T) {
 	user := entity.User{
-		Email: entity.Email{Value: "user@email.com"},
-		Name:  "User",
+		Email:    entity.Email{Value: "user@email.com"},
+		Name:     "User",
+		Password: entity.Password{Value: "12345678Na!"},
 	}
 	err := user.Create()
 

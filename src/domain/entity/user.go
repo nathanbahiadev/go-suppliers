@@ -3,6 +3,7 @@ package entity
 import (
 	"errors"
 	"regexp"
+	"unicode"
 
 	"github.com/google/uuid"
 )
@@ -58,5 +59,28 @@ type Password struct {
 }
 
 func (p *Password) Validate() error {
-	return nil
+	var hasUpper, hasLower, hasNumber, hasPunc bool
+
+	if len(p.Value) < 8 {
+		return errors.New("password length must be greater than or equal to 8")
+	}
+
+	for _, char := range p.Value {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsNumber(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasPunc = true
+		}
+	}
+
+	if hasUpper && hasLower && hasNumber && hasPunc {
+		return nil
+	}
+
+	return errors.New("password must contain at least 1 uppercase letter, 1 lowercase letter, a symbol or punctuation and 1 number and its length must be greater than or equal to 8")
 }

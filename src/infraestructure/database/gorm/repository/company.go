@@ -6,10 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type CompanyRepository struct{}
+type CompanyRepository struct {
+	DB *gorm.DB
+}
 
-func (r *CompanyRepository) Create(DB *gorm.DB, c *entity.Company) error {
-	return DB.Create(&model.CompanyModel{
+func (r *CompanyRepository) Create(c *entity.Company) error {
+	return r.DB.Create(&model.CompanyModel{
 		ID:     c.ID,
 		Name:   c.Name,
 		CNPJ:   c.CNPJ.Value,
@@ -21,10 +23,10 @@ func (r *CompanyRepository) Update(c *entity.Company) error {
 	return nil
 }
 
-func (r *CompanyRepository) Find(DB *gorm.DB, id string) (*entity.Company, error) {
+func (r *CompanyRepository) Find(id string) (*entity.Company, error) {
 	companyModel := model.CompanyModel{}
 
-	if err := DB.Preload("UserModel").First(&companyModel, "id = ?", id).Error; err != nil {
+	if err := r.DB.Preload("UserModel").First(&companyModel, "id = ?", id).Error; err != nil {
 		return &entity.Company{}, err
 	}
 

@@ -6,10 +6,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct{}
+type UserRepository struct {
+	DB *gorm.DB
+}
 
-func (r *UserRepository) Create(DB *gorm.DB, u *entity.User) error {
-	return DB.Create(&model.UserModel{
+func (r *UserRepository) Create(u *entity.User) error {
+	return r.DB.Create(&model.UserModel{
 		ID:       u.ID,
 		Email:    u.Email.Value,
 		Password: u.Password.Value,
@@ -21,10 +23,10 @@ func (r *UserRepository) Update(u *entity.User) error {
 	return nil
 }
 
-func (r *UserRepository) Find(DB *gorm.DB, id string) (*entity.User, error) {
+func (r *UserRepository) Find(id string) (*entity.User, error) {
 	userModel := model.UserModel{}
 
-	if err := DB.First(&userModel, "id = ?", id).Error; err != nil {
+	if err := r.DB.First(&userModel, "id = ?", id).Error; err != nil {
 		return &entity.User{}, err
 	}
 
@@ -33,8 +35,4 @@ func (r *UserRepository) Find(DB *gorm.DB, id string) (*entity.User, error) {
 		Name:  userModel.Name,
 		Email: entity.Email{Value: userModel.Email},
 	}, nil
-}
-
-func (r *UserRepository) FindAll(id string) ([]*entity.User, error) {
-	return nil, nil
 }

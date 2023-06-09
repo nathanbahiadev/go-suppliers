@@ -8,8 +8,8 @@ import (
 )
 
 func (suite *DatabaseSuiteTest) TestCreateCompany() {
-	companyRepository := repository.CompanyRepository{}
-	userRepository := repository.UserRepository{}
+	companyRepository := repository.CompanyRepository{DB: suite.DB}
+	userRepository := repository.UserRepository{DB: suite.DB}
 
 	var err error
 
@@ -19,7 +19,7 @@ func (suite *DatabaseSuiteTest) TestCreateCompany() {
 	}
 	user.Create()
 
-	err = userRepository.Create(suite.DB, &user)
+	err = userRepository.Create(&user)
 	assert.Nil(suite.T(), err)
 
 	companyCreated := entity.Company{
@@ -31,7 +31,7 @@ func (suite *DatabaseSuiteTest) TestCreateCompany() {
 	}
 	companyCreated.Create()
 
-	err = companyRepository.Create(suite.DB, &companyCreated)
+	err = companyRepository.Create(&companyCreated)
 	assert.Nil(suite.T(), err)
 
 	companyModel := &model.CompanyModel{}
@@ -44,8 +44,8 @@ func (suite *DatabaseSuiteTest) TestCreateCompany() {
 }
 
 func (suite *DatabaseSuiteTest) TestFindCompany() {
-	companyRepository := repository.CompanyRepository{}
-	userRepository := repository.UserRepository{}
+	companyRepository := repository.CompanyRepository{DB: suite.DB}
+	userRepository := repository.UserRepository{DB: suite.DB}
 
 	var err error
 
@@ -55,7 +55,7 @@ func (suite *DatabaseSuiteTest) TestFindCompany() {
 	}
 	user.Create()
 
-	err = userRepository.Create(suite.DB, &user)
+	err = userRepository.Create(&user)
 	assert.Nil(suite.T(), err)
 
 	companyCreated := entity.Company{
@@ -67,13 +67,13 @@ func (suite *DatabaseSuiteTest) TestFindCompany() {
 	}
 	companyCreated.Create()
 
-	err = companyRepository.Create(suite.DB, &companyCreated)
+	err = companyRepository.Create(&companyCreated)
 	assert.Nil(suite.T(), err)
 
 	companyModel := &model.CompanyModel{}
 	suite.DB.First(companyModel, "id = ?", companyCreated.ID)
 
-	companyFounded, err := companyRepository.Find(suite.DB, companyCreated.ID)
+	companyFounded, err := companyRepository.Find(companyCreated.ID)
 	assert.Nil(suite.T(), err)
 
 	assert.Equal(suite.T(), companyModel.ID, companyFounded.ID, "company ids aren't equal")
@@ -83,8 +83,8 @@ func (suite *DatabaseSuiteTest) TestFindCompany() {
 }
 
 func (suite *DatabaseSuiteTest) TestFindCompanyShouldRaiseAnErrorWhenCompanyDoesNotExists() {
-	companyRepository := repository.CompanyRepository{}
-	company, err := companyRepository.Find(suite.DB, "1")
+	companyRepository := repository.CompanyRepository{DB: suite.DB}
+	company, err := companyRepository.Find("1")
 
 	assert.NotNil(suite.T(), err)
 	assert.Equal(suite.T(), err.Error(), "record not found")

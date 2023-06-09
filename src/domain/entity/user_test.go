@@ -66,6 +66,7 @@ func TestInvalidPasswords(t *testing.T) {
 		{Value: "aaaaaaa1"},
 		{Value: "@@@@@@@@"},
 		{Value: "N@@@@@@@"},
+		{Value: "Na#1"},
 	}
 
 	for _, password := range passwords {
@@ -88,6 +89,17 @@ func TestValidateUserWhenEmailIsInvalidShouldRaiseAnError(t *testing.T) {
 
 	err := user.Validate()
 	assert.Equal(t, err.Error(), "email invalid")
+}
+
+func TestValidateUserWhenPasswordIsInvalidShouldRaiseAnError(t *testing.T) {
+	user := entity.User{
+		ID:       "1",
+		Email:    entity.Email{Value: "user@email.com"},
+		Password: entity.Password{Value: "12345678"},
+	}
+
+	err := user.Validate()
+	assert.Equal(t, err.Error(), "password must contain at least 1 uppercase letter, 1 lowercase letter, a symbol or punctuation and 1 number and its length must be greater than or equal to 8")
 }
 
 func TestValidateUserWhenNameIsEmptyShouldRaiseAnError(t *testing.T) {

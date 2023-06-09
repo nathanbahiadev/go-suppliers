@@ -7,7 +7,7 @@ import (
 )
 
 func (suite *DatabaseSuiteTest) TestCreateUser() {
-	userRepository := repository.UserRepository{}
+	userRepository := repository.UserRepository{DB: suite.DB}
 
 	user := entity.User{
 		Email: entity.Email{Value: "user1@email.com"},
@@ -15,12 +15,12 @@ func (suite *DatabaseSuiteTest) TestCreateUser() {
 	}
 	user.Create()
 
-	err := userRepository.Create(suite.DB, &user)
+	err := userRepository.Create(&user)
 	assert.Nil(suite.T(), err)
 }
 
 func (suite *DatabaseSuiteTest) TestFindUser() {
-	userRepository := repository.UserRepository{}
+	userRepository := repository.UserRepository{DB: suite.DB}
 
 	userCreated := entity.User{
 		Email: entity.Email{Value: "user@email.com"},
@@ -28,10 +28,10 @@ func (suite *DatabaseSuiteTest) TestFindUser() {
 	}
 	userCreated.Create()
 
-	err := userRepository.Create(suite.DB, &userCreated)
+	err := userRepository.Create(&userCreated)
 	assert.Nil(suite.T(), err)
 
-	userFounded, err := userRepository.Find(suite.DB, userCreated.ID)
+	userFounded, err := userRepository.Find(userCreated.ID)
 
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), userFounded.ID, userCreated.ID)
@@ -40,8 +40,8 @@ func (suite *DatabaseSuiteTest) TestFindUser() {
 }
 
 func (suite *DatabaseSuiteTest) TestFindUserShouldRaiseAnErrorWhenUserDoesNotExists() {
-	userRepository := repository.UserRepository{}
-	user, err := userRepository.Find(suite.DB, "1")
+	userRepository := repository.UserRepository{DB: suite.DB}
+	user, err := userRepository.Find("1")
 
 	assert.NotNil(suite.T(), err)
 	assert.Equal(suite.T(), err.Error(), "record not found")

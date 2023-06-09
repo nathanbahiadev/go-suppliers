@@ -7,6 +7,9 @@ import (
 
 func StartServer() {
 	r := gin.Default()
-	r.GET("/", controllers.CheckStatus)
+
+	apiv1 := r.Group("/api/v1")
+	apiv1.POST("/users/", controllers.CreateUserController)
+
 	r.Run()
 }

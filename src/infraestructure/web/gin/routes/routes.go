@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nathanbahiadev/go-suppliers/src/infraestructure/web/controllers"
+	"github.com/nathanbahiadev/go-suppliers/src/infraestructure/web/gin/controllers"
 )
 
 func StartServer() {
